@@ -1,0 +1,141 @@
+═══════════════════════════════════════════════════════════════════
+  FLASHSCORE LAY ANALYZER - INSTRUÇÕES DE INICIALIZAÇÃO
+═══════════════════════════════════════════════════════════════════
+
+🚀 COMECE A USAR COM APENAS 1 CLIQUE!
+
+═══════════════════════════════════════════════════════════════════
+  OPÇÃO 1: USAR O ARQUIVO .BAT (RECOMENDADO PARA WINDOWS)
+═══════════════════════════════════════════════════════════════════
+
+1. Vá até a pasta do projeto:
+   C:\Users\Bispo\.Projetos\flashscore-lay
+
+2. Dê um duplo clique no arquivo:
+   INICIAR.bat
+
+3. Aguarde o processo automático:
+   ✓ Verificar ambiente virtual
+   ✓ Instalar dependências
+   ✓ Iniciar aplicação
+
+4. Acesse no navegador:
+   http://localhost:5000
+
+5. Na interface, clique na aba "Método de Ciclos"
+
+
+═══════════════════════════════════════════════════════════════════
+  OPÇÃO 2: CRIAR ATALHO NA ÁREA DE TRABALHO
+═══════════════════════════════════════════════════════════════════
+
+1. Vá até a pasta do projeto
+
+2. Dê um duplo clique no arquivo:
+   CRIAR_ATALHO.bat
+
+3. Um atalho será criado na sua área de trabalho:
+   "Flashscore Lay Analyzer.lnk"
+
+4. Depois basta dar um duplo clique no atalho na área de trabalho!
+
+
+═══════════════════════════════════════════════════════════════════
+  OPÇÃO 3: USAR O ARQUIVO PYTHON (QUALQUER SISTEMA)
+═══════════════════════════════════════════════════════════════════
+
+1. Vá até a pasta do projeto
+
+2. Dê um duplo clique no arquivo:
+   INICIAR.py
+
+3. O sistema fará tudo automaticamente
+
+
+═══════════════════════════════════════════════════════════════════
+  O QUE ACONTECE AUTOMATICAMENTE:
+═══════════════════════════════════════════════════════════════════
+
+✓ Verifica se existe ambiente virtual
+✓ Cria ambiente virtual se necessário
+✓ Ativa o ambiente virtual
+✓ Instala/Atualiza todas as dependências:
+  - Flask (servidor web)
+  - Selenium (scraping)
+  - BeautifulSoup4 (processamento HTML)
+  - Pandas (análise de dados)
+  - Webdriver-manager (controle do navegador)
+  - OpenPyxl (planilhas Excel)
+✓ Verifica se todos os arquivos do sistema existem
+✓ Inicia o servidor web
+✓ Abre automaticamente no navegador
+
+
+═══════════════════════════════════════════════════════════════════
+  PRIMEIRO USO - MÉTODO DE CICLOS:
+═══════════════════════════════════════════════════════════════════
+
+1. Acesse: http://localhost:5000
+
+2. Clique na aba: "Método de Ciclos"
+
+3. Leia o aviso sobre operação em dinheiro real
+
+4. Clique em "Criar Ciclo"
+
+5. Escolha:
+   - Perfil: Conservador (4%), Moderado (4-5%) ou Agressivo (8%)
+   - Banca Inicial: ex: R$ 100
+
+6. Clique em "Criar Ciclo"
+
+7. Adicione suas entradas com os dados dos jogos
+
+
+═══════════════════════════════════════════════════════════════════
+  PARA PARAR O SISTEMA:
+═══════════════════════════════════════════════════════════════════
+
+No terminal onde o sistema está rodando:
+- Pressione: CTRL + C
+
+Ou simplesmente feche a janela do terminal.
+
+
+═══════════════════════════════════════════════════════════════════
+  SOLUÇÃO DE PROBLEMAS:
+═══════════════════════════════════════════════════════════════════
+
+❌ O navegador não abre:
+   - Abra manualmente: http://localhost:5000
+   - Verifique se a porta 5000 não está em uso
+
+❌ Erro de permissão:
+   - Execute como Administrador
+   - Verifique permissões da pasta
+
+❌ Erro de dependências:
+   - O sistema instala automaticamente
+   - Se falhar, execute: pip install flask selenium beautifulsoup4
+
+❌ Porta 5000 ocupada:
+   - Edite o arquivo app.py (final do arquivo)
+   - Mude port=5000 para port=5001
+   - Acesse: http://localhost:5001
+
+
+═══════════════════════════════════════════════════════════════════
+  ARQUIVOS CRIADOS PARA FACILITAR:
+═══════════════════════════════════════════════════════════════════
+
+📁 INICIAR.bat          - Script automático para Windows (RECOMENDADO)
+📁 INICIAR.py           - Script automático em Python (qualquer sistema)
+📁 CRIAR_ATALHO.bat     - Cria atalho na área de trabalho
+📁 COMO_USAR.txt        - Este arquivo de instruções
+
+
+═══════════════════════════════════════════════════════════════════
+
+BOA SORTE COM SEUS TRADES! 🍀
+
+═══════════════════════════════════════════════════════════════════

@@ -1,0 +1,70 @@
+[
+  {
+    "ciclo_numero": 1,
+    "perfil": "conservador",
+    "banca_inicial": 100.0,
+    "stake_inicial": 100.0,
+    "objetivo_porcentagem": 0.04,
+    "objetivo_final": 500.0,
+    "entradas": [
+      {
+        "jogo_numero": 1,
+        "time_casa": "Brasil",
+        "time_fora": "Argentina",
+        "campeonato": "Copa do Mundo",
+        "estrategia": "Lay Favorito (1º Tempo)",
+        "stake_inicial": 100.0,
+        "banca_trabalho": 100.0,
+        "banca_teorica": 104.0,
+        "objetivo_porcentagem": 0.04,
+        "objetivo_valor": 4.0,
+        "lucro_real": 4.5,
+        "resultado": "OK",
+        "residuo": 0.5,
+        "data_hora": "2026-06-16T14:35:36.706852",
+        "odds": null
+      }
+    ],
+    "lucro_acumulado": 4.5,
+    "residuo_acumulado": 0.5,
+    "banca_atual": 104.5,
+    "status": "em_andamento",
+    "data_inicio": "2026-06-16T14:35:36.705565",
+    "data_fim": null,
+    "saque_teorico": 0.0
+  },
+  {
+    "ciclo_numero": 2,
+    "perfil": "conservador",
+    "banca_inicial": 100.0,
+    "stake_inicial": 100.0,
+    "objetivo_porcentagem": 0.04,
+    "objetivo_final": 500.0,
+    "entradas": [
+      {
+        "jogo_numero": 1,
+        "time_casa": "Brasil",
+        "time_fora": "Argentina",
+        "campeonato": "Copa do Mundo",
+        "estrategia": "Lay Favorito (1º Tempo)",
+        "stake_inicial": 100.0,
+        "banca_trabalho": 100.0,
+        "banca_teorica": 104.0,
+        "objetivo_porcentagem": 0.04,
+        "objetivo_valor": 4.0,
+        "lucro_real": 4.5,
+        "resultado": "OK",
+        "residuo": 0.5,
+        "data_hora": "2026-06-16T14:35:37.870458",
+        "odds": null
+      }
+    ],
+    "lucro_acumulado": 4.5,
+    "residuo_acumulado": 0.5,
+    "banca_atual": 104.5,
+    "status": "em_andamento",
+    "data_inicio": "2026-06-16T14:35:37.868996",
+    "data_fim": null,
+    "saque_teorico": 0.0
+  }
+]
