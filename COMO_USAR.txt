@@ -135,6 +135,28 @@ Ou simplesmente feche a janela do terminal.
 
 
 ═══════════════════════════════════════════════════════════════════
+  ACESSO REMOTO - COMUNICAÇÃO LOCAL ↔ NUVEM
+═══════════════════════════════════════════════════════════════════
+
+🌐 URL NA NUVEM: https://laycs.onrender.com
+
+Para usar a análise de jogos através da nuvem (de qualquer lugar):
+
+1. Execute INICIAR.bat (sistema local deve estar rodando)
+2. Configure acesso remoto:
+   - Execute ACESSO_REMOTO_NGROK.bat (recomendado)
+   - Ou configure IP público (veja CONFIGURAR_IP_NUVEM.md)
+3. Configure a variável LOCAL_API_URL no Render
+4. Acesse https://laycs.onrender.com e use a aba "Análise"
+
+📋 Documentação completa: COMUNICACAO_LOCAL_NUVEM.md
+
+⚠️  O Método de Ciclos funciona 100% na nuvem sem necessidade de
+   configuração adicional. Use a aba "Método de Ciclos" diretamente
+   em https://laycs.onrender.com
+
+
+═══════════════════════════════════════════════════════════════════
 
 BOA SORTE COM SEUS TRADES! 🍀
 

@@ -6,6 +6,8 @@
 # Inspecione o site com F12 (DevTools) e atualize as constantes abaixo.
 # =============================================================================
 
+import os
+
 # --- URLs ---
 BASE_URL       = "https://www.flashscore.com.br/"
 GAME_BASE_URL  = "https://www.flashscore.com.br/jogo/"   # + ID do jogo + "/#/h2h/h2h-geral"
@@ -88,3 +90,8 @@ AUTO_RUN_MINUTO   = 0
 AUTO_RUN_AMANHA_HORA   = 22   # hora para análise prévia dos jogos de AMANHÃ
 AUTO_RUN_AMANHA_MINUTO = 0
 AUTO_RUN_HEADLESS = True  # rodar sem janela visível no modo automático
+
+# --- Comunicação Local ↔ Nuvem ---
+LOCAL_API_URL = os.environ.get('LOCAL_API_URL', 'http://localhost:5000')
+LOCAL_API_TIMEOUT = 300  # segundos (5 minutos para scraping)
+LOCAL_API_KEY = os.environ.get('LOCAL_API_KEY', 'flashscore-lay-2024-secret')  # Chave de autenticação

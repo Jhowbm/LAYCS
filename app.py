@@ -4,9 +4,10 @@
 # =============================================================================
 
 from flask import Flask, render_template_string, request, jsonify
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import sys
 import os
+import requests
 
 # Adiciona o diretório atual ao path para importar os módulos
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -870,19 +871,81 @@ def index():
 
 @app.route('/api/analizar')
 def analisar():
-    """API para analisar jogos."""
+    """API para analisar jogos - consume API local se estiver em nuvem."""
     # Verificar se está em ambiente de nuvem
     is_cloud = os.environ.get('RENDER', 'false').lower() == 'true'
     
     if is_cloud:
-        # Em nuvem, retornar mensagem de que scraping não está disponível
-        return jsonify({
-            'error': 'A análise de jogos em tempo real não está disponível na versão em nuvem. Use o Método de Ciclos para gerenciar suas operações.',
-            'jogos': [],
-            'cloud_mode': True,
-            'message': 'O scraping requer Firefox/Selenium que não funcionam em ambiente de nuvem gratuito. Use o sistema local para análise ou foque no Método de Ciclos.'
-        })
+        # Em nuvem, tentar consumir API local
+        try:
+            dias = int(request.args.get('dias', 0))
+            
+            # Chamar API local
+            local_api_url = config.LOCAL_API_URL
+            
+            print(f"[NUVEM] Tentando conectar ao sistema local: {local_api_url}")
+            
+            response = requests.post(
+                f"{local_api_url}/api/local/analizar",
+                json={'dias': dias},
+                headers={'X-API-Key': config.LOCAL_API_KEY},
+                timeout=config.LOCAL_API_TIMEOUT
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success'):
+                    return jsonify({
+                        'error': None,
+                        'jogos': data.get('jogos', []),
+                        'total': data.get('total', 0),
+                        'source': 'local_api',
+                        'timestamp': data.get('timestamp')
+                    })
+                else:
+                    return jsonify({
+                        'error': data.get('error', 'Erro na análise local'),
+                        'jogos': [],
+                        'source': 'local_api_error'
+                    })
+            elif response.status_code == 401:
+                return jsonify({
+                    'error': 'Erro de autenticação com sistema local',
+                    'jogos': [],
+                    'cloud_mode': True,
+                    'message': 'A chave de API não corresponde. Verifique a configuração LOCAL_API_KEY no Render.'
+                })
+            else:
+                return jsonify({
+                    'error': f'Sistema local não respondeu (Status: {response.status_code})',
+                    'jogos': [],
+                    'cloud_mode': True,
+                    'message': 'Verifique se o sistema local está rodando (INICIAR.bat) e se o IP está configurado corretamente.'
+                })
+                
+        except requests.exceptions.Timeout:
+            return jsonify({
+                'error': 'Tempo esgotado ao conectar ao sistema local',
+                'jogos': [],
+                'cloud_mode': True,
+                'message': 'O scraping demorou mais que 5 minutos. Verifique sua conexão ou execute a análise localmente.'
+            })
+        except requests.exceptions.ConnectionError:
+            return jsonify({
+                'error': 'Não foi possível conectar ao sistema local',
+                'jogos': [],
+                'cloud_mode': True,
+                'message': 'Verifique se o sistema local está rodando (execute INICIAR.bat) e se o IP está configurado corretamente no ambiente de variáveis LOCAL_API_URL.'
+            })
+        except Exception as e:
+            return jsonify({
+                'error': f'Erro ao conectar ao sistema local: {str(e)}',
+                'jogos': [],
+                'cloud_mode': True,
+                'message': 'Verifique a configuração do sistema local.'
+            })
     
+    # Execução local normal
     try:
         dias = int(request.args.get('dias', 0))
         
@@ -936,7 +999,8 @@ def analisar():
         return jsonify({
             'error': None,
             'jogos': jogos_processados,
-            'total': len(jogos_processados)
+            'total': len(jogos_processados),
+            'source': 'local'
         })
         
     except Exception as e:
@@ -1016,6 +1080,142 @@ def resumo_ciclos():
         return jsonify(resumo)
     except Exception as e:
         return jsonify({'error': str(e)})
+
+
+# =============================================================================
+# API PARA COMUNICAÇÃO LOCAL → NUVEM
+# =============================================================================
+
+def verificar_autenticacao():
+    """Verifica se a requisição tem a chave de API correta."""
+    api_key = request.headers.get('X-API-Key')
+    return api_key == config.LOCAL_API_KEY
+
+
+@app.route('/api/local/analizar', methods=['POST'])
+def analisar_local_para_nuvem():
+    """
+    API para sistema local executar análise e enviar para nuvem.
+    Chamado pela nuvem quando precisa de dados de análise.
+    """
+    # Verificar autenticação
+    if not verificar_autenticacao():
+        return jsonify({
+            'success': False,
+            'error': 'Não autorizado - chave de API inválida'
+        }), 401
+    
+    try:
+        data = request.json
+        dias = data.get('dias', 0)
+        
+        print(f"[API LOCAL] Recebida requisição de análise da nuvem - dias: {dias}")
+        
+        # Verificar se não está em modo nuvem
+        if os.environ.get('RENDER', 'false').lower() == 'true':
+            return jsonify({
+                'success': False,
+                'error': 'Esta API não deve ser chamada na nuvem',
+                'message': 'Use a API local para executar análise'
+            })
+        
+        # Executar análise completa (com scraping)
+        driver = setup_driver(headless=True)
+        
+        # Coletar jogos
+        jogos = coletar_jogos_do_dia(driver, dias_frente=dias)
+        
+        if not jogos:
+            driver.quit()
+            print(f"[API LOCAL] Nenhum jogo encontrado")
+            return jsonify({
+                'success': False,
+                'error': 'Nenhum jogo encontrado',
+                'jogos': []
+            })
+        
+        print(f"[API LOCAL] Encontrados {len(jogos)} jogos para analisar")
+        
+        # Processar jogos
+        jogos_processados = []
+        for i, jogo in enumerate(jogos):
+            try:
+                print(f"[API LOCAL] Processando jogo {i+1}/{len(jogos)}: {jogo['time_casa']} vs {jogo['time_fora']}")
+                
+                # Coletar H2H
+                h2h = coletar_h2h(driver, jogo["url"], jogo["id"])
+                
+                # Coletar odds
+                odds = coletar_odds(driver, jogo["id"], url_jogo=jogo["url"])
+                
+                # Analisar
+                freqs = calcular_frequencias_jogo(h2h, odds)
+                classif, tipo_lay = classificar_oportunidade(freqs, odds, config.LIMIAR_OPORTUNIDADE)
+                
+                # Extrair métricas para exibição
+                ev_key = f'ev_{tipo_lay.lower().replace("lay_", "")}'
+                retorno_key = f'retorno_{tipo_lay.lower().replace("lay_", "")}'
+                prob_key = f'prob_estimada_{tipo_lay.lower().replace("lay_", "")}'
+                
+                jogos_processados.append({
+                    'hora': jogo['hora'],
+                    'time_casa': jogo['time_casa'],
+                    'time_fora': jogo['time_fora'],
+                    'is_copa_do_mundo': é_copa_do_mundo(jogo['time_casa'], jogo['time_fora']),
+                    'tipo_lay': tipo_lay,
+                    'classificacao': classif,
+                    'ev': freqs.get(ev_key, 0.0),
+                    'retorno': freqs.get(retorno_key, 0.0),
+                    'probabilidade': freqs.get(prob_key, 0.0),
+                    'media_gols': freqs.get('media_gols_confronto', 0.0)
+                })
+            except Exception as e:
+                print(f"[API LOCAL] Erro ao processar jogo {jogo['id']}: {e}")
+                continue
+        
+        driver.quit()
+        
+        print(f"[API LOCAL] Análise concluída - {len(jogos_processados)} jogos processados")
+        
+        return jsonify({
+            'success': True,
+            'jogos': jogos_processados,
+            'total': len(jogos_processados),
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        print(f"[API LOCAL] Erro na análise: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'jogos': []
+        })
+
+
+@app.route('/api/local/status')
+def status_sistema_local():
+    """API para verificar se sistema local está ativo."""
+    # Verificar autenticação
+    if not verificar_autenticacao():
+        return jsonify({
+            'success': False,
+            'error': 'Não autorizado - chave de API inválida'
+        }), 401
+    
+    try:
+        return jsonify({
+            'success': True,
+            'status': 'online',
+            'timestamp': datetime.now().isoformat(),
+            'version': '1.0',
+            'modo': 'local'
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        })
 
 
 if __name__ == '__main__':
