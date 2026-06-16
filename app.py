@@ -425,6 +425,10 @@ HTML_TEMPLATE = """
         
         <!-- Tab: Análise de Jogos -->
         <div id="tab-analise" class="tab-content active">
+            <div class="warning-box" id="cloud-warning" style="display: none;">
+                <strong>⚠️ Modo Nuvem Detectado:</strong> A análise de jogos em tempo real não está disponível na versão em nuvem, pois requer Firefox/Selenium que não funcionam em ambiente de nuvem gratuito. Use o <strong>Método de Ciclos</strong> para gerenciar suas operações ou execute a análise localmente.
+            </div>
+            
             <div class="form-group">
                 <label for="dias">Selecione o dia:</label>
                 <select id="dias">
@@ -508,6 +512,14 @@ HTML_TEMPLATE = """
                 .then(data => {
                     loading.classList.remove('active');
                     btn.disabled = false;
+                    
+                    // Verificar se está em modo nuvem
+                    if (data.cloud_mode) {
+                        document.getElementById('cloud-warning').style.display = 'block';
+                        error.textContent = '⚠️ ' + data.message;
+                        error.classList.add('active');
+                        return;
+                    }
                     
                     if (data.error) {
                         error.textContent = '❌ ' + data.error;
@@ -859,6 +871,18 @@ def index():
 @app.route('/api/analizar')
 def analisar():
     """API para analisar jogos."""
+    # Verificar se está em ambiente de nuvem
+    is_cloud = os.environ.get('RENDER', 'false').lower() == 'true'
+    
+    if is_cloud:
+        # Em nuvem, retornar mensagem de que scraping não está disponível
+        return jsonify({
+            'error': 'A análise de jogos em tempo real não está disponível na versão em nuvem. Use o Método de Ciclos para gerenciar suas operações.',
+            'jogos': [],
+            'cloud_mode': True,
+            'message': 'O scraping requer Firefox/Selenium que não funcionam em ambiente de nuvem gratuito. Use o sistema local para análise ou foque no Método de Ciclos.'
+        })
+    
     try:
         dias = int(request.args.get('dias', 0))
         
